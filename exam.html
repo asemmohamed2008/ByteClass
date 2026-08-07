@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByteClass | الامتحانات الأونلاين والمراجعة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/png" href="images/image.png">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --surface-color: #161b22;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --text-main: #f0f6fc;
+            --text-dim: #8b949e;
+            --border-color: #30363d;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .exam-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+            display: none;
+        }
+
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .exam-title h1 { font-size: 20px; color: var(--accent-blue); margin-bottom: 5px; }
+        .exam-title p { font-size: 13px; color: var(--text-dim); }
+
+        .timer-box {
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .exam-preview-card, .empty-state-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .exam-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .info-box {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 12px;
+        }
+        .info-box span { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 5px; }
+        .info-box strong { font-size: 16px; font-family: 'Fira Code', monospace; }
+
+        .question-box {
+            margin-bottom: 25px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        .question-text { font-size: 16px; font-weight: 700; margin-bottom: 15px; line-height: 1.6; text-align: right; }
+
+        .options-list { display: flex; flex-direction: column; gap: 10px; }
+        .option-item {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .explanation-box {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(88, 166, 255, 0.05);
+            border-right: 3px solid var(--accent-blue);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text-dim);
+            text-align: right;
+        }
+
+        .submit-exam-btn, .start-now-btn {
+            width: 100%;
+            background-color: var(--accent-green);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .submit-exam-btn:hover, .start-now-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        .back-dashboard-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #1f6feb, #238636);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            margin-top: 25px;
+            box-shadow: 0 4px 12px rgba(31, 111, 235, 0.3);
+            transition: var(--transition);
+        }
+        .back-dashboard-btn:hover {
+            background: linear-gradient(135deg, #388bfd, #2ea043);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(46, 160, 67, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .result-card { text-align: center; padding: 20px; }
+        .result-card i { font-size: 50px; color: var(--accent-green); margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="exam-container" id="preview-box">
+        <div class="exam-header">
+            <div class="exam-title">
+                <h1 id="preview-exam-title">اختبار المنهج</h1>
+                <p>استعد جيداً قبل البدء في حل الأسئلة.</p>
+            </div>
+            <a href="dashboard.html" style="color: var(--text-dim); text-decoration: none; font-size: 14px;"><i class="fa-solid fa-arrow-right"></i> لوحة التحكم</a>
+        </div>
+        <div class="exam-preview-card">
+            <i class="fa-solid fa-clipboard-question" style="font-size: 50px; color: var(--accent-blue); margin-bottom: 15px;"></i>
+            <h3 id="preview-card-title" style="font-size: 18px; margin-bottom: 10px;">اختبار البرمجة الأونلاين</h3>
+            <p style="color: var(--text-dim); font-size: 14px; margin-bottom: 20px;">هذا الاختبار مصمم لقياس مستواك وتطوير مهاراتك البرمجية.</p>
+
+            <div class="exam-info-grid">
+                <div class="info-box"><span>مدة الاختبار</span><strong id="preview-duration">5 دقائق</strong></div>
+                <div class="info-box"><span>عدد الأسئلة</span><strong id="preview-q-count">0 أسئلة</strong></div>
+                <div class="info-box"><span>إجمالي الدرجات</span><strong id="preview-total-score">0 درجة</strong></div>
+            </div>
+
+            <button onclick="startExamSession()" class="start-now-btn">
+                <i class="fa-solid fa-play"></i> ابدأ الاختبار الآن
+            </button>
+        </div>
+    </div>
+
+    <div class="exam-container" id="no-exam-box">
+        <div class="exam-header">
+            <div class="exam-title">
+                <h1>الامتحانات الأونلاين</h1>
+                <p>حالة الاختبارات الحالية.</p>
+            </div>
+            <a href="dashboard.html" style="color: var(--text-dim); text-decoration: none; font-size: 14px;"><i class="fa-solid fa-arrow-right"></i> لوحة التحكم</a>
+        </div>
+        <div class="empty-state-card">
+            <i class="fa-solid fa-circle-exclamation" style="font-size: 50px; color: var(--accent-blue); margin-bottom: 15px;"></i>
+            <h3 style="font-size: 18px; margin-bottom: 10px; color: var(--text-main);">لا توجد اختبارات جديدة متاحة للحل حالياً</h3>
+            <p style="color: var(--text-dim); font-size: 14px; margin-bottom: 15px;">لقد أتممت هذا الاختبار من قبل. يمكنك مراجعة نتيجته من سجل لوحة التحكم الرئيسية.</p>
+
+            <a href="dashboard.html" class="back-dashboard-btn">
+                <i class="fa-solid fa-house-chimney"></i> العودة إلى لوحة التحكم الرئيسية
+            </a>
+        </div>
+    </div>
+
+    <div class="exam-container" id="exam-box">
+        <div class="exam-header">
+            <div class="exam-title">
+                <h1 id="active-exam-title">اختبار البرمجة الأونلاين</h1>
+                <p>أجب عن الأسئلة بدقة.</p>
+            </div>
+            <div class="timer-box">
+                <i class="fa-regular fa-clock"></i> <span id="time-left">05:00</span>
+            </div>
+        </div>
+
+        <form id="quiz-form">
+            <div id="questions-container"></div>
+            <button type="submit" class="submit-exam-btn" style="margin-top: 20px;">
+                <i class="fa-solid fa-paper-plane"></i> تسليم الامتحان ورصد الدرجة
+            </button>
+        </form>
+    </div>
+
+    <div class="exam-container result-card" id="result-box">
+        <i class="fa-solid fa-trophy"></i>
+        <h2 id="result-main-title">تقرير نتيجة الاختبار</h2>
+        <p id="score-details" style="color: var(--text-dim); margin-top: 5px; font-size: 15px; font-weight: 700;"></p>
+        <div id="review-container" style="text-align: right; margin-top: 25px;"></div>
+
+        <a href="dashboard.html" class="back-dashboard-btn">
+            <i class="fa-solid fa-house-chimney"></i> العودة إلى لوحة التحكم الرئيسية
+        </a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBESs1L-1OBtPQZzqZ6nTH-Waka3dWajMM",
+            authDomain: "byteclass-platform.firebaseapp.com",
+            projectId: "byteclass-platform",
+            storageBucket: "byteclass-platform.firebasestorage.app",
+            messagingSenderId: "933460563812",
+            appId: "1:933460563812:web:4215e97f147c92ce634c71",
+            measurementId: "G-0PCY6G9FMF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let examQuestions = [];
+        let examDurationMinutes = 5;
+        let currentActiveExamId = "";
+        let currentExamTitle = "";
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const phone = sessionStorage.getItem("studentPhone");
+            if (!phone) { window.location.href = "login.html"; return; }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const reviewExamId = urlParams.get('reviewId');
+
+            try {
+                const studentRef = doc(db, "students", phone);
+                const studentSnap = await getDoc(studentRef);
+
+                if (!studentSnap.exists()) { window.location.href = "login.html"; return; }
+
+                const studentData = studentSnap.data();
+
+                // جلب امتحان الصف من السحابة
+                const examSnap = await getDoc(doc(db, "exams", studentData.grade));
+
+                if (!examSnap.exists()) {
+                    document.getElementById('no-exam-box').style.display = 'block';
+                    return;
+                }
+
+                const examData = examSnap.data();
+                currentActiveExamId = examData.examId || "exam_v1";
+                currentExamTitle = examData.title || "اختبار المنهج";
+                examQuestions = examData.questions || [];
+                examDurationMinutes = examData.duration || 5;
+
+                // إذا طلب مراجعة اختبار معين قديم من الـ URL
+                if (reviewExamId) {
+                    const completedList = studentData.completedExams || [];
+                    const targetExam = completedList.find(ex => ex.examId === reviewExamId);
+                    if (targetExam) {
+                        showReviewScreen(targetExam.answers, targetExam.examTitle, targetExam.score, targetExam.totalScore);
+                        return;
+                    }
+                }
+
+                // تعبئة واجهة المعاينة
+                document.getElementById('preview-exam-title').innerText = currentExamTitle;
+                document.getElementById('preview-card-title').innerText = currentExamTitle;
+                document.getElementById('active-exam-title').innerText = currentExamTitle;
+                document.getElementById('preview-duration').innerText = `${examDurationMinutes} دقائق`;
+                document.getElementById('preview-q-count').innerText = `${examQuestions.length} أسئلة`;
+                document.getElementById('preview-total-score').innerText = `${examQuestions.length * 10} درجة`;
+
+                // التحقق هل الطالب حل هذا الامتحان الحالي من قبل؟
+                const completedList = studentData.completedExams || [];
+                const alreadySolved = completedList.some(ex => ex.examId === currentActiveExamId);
+
+                if (alreadySolved) {
+                    document.getElementById('no-exam-box').style.display = 'block';
+                } else {
+                    document.getElementById('preview-box').style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('no-exam-box').style.display = 'block';
+            }
+        });
+
+        let timerInterval;
+
+        window.startExamSession = function() {
+            document.getElementById('preview-box').style.display = 'none';
+            document.getElementById('no-exam-box').style.display = 'none';
+            document.getElementById('exam-box').style.display = 'block';
+
+            const container = document.getElementById('questions-container');
+            let htmlContent = "";
+            examQuestions.forEach((q, index) => {
+                htmlContent += `
+                    <div class="question-box">
+                        <div class="question-text">${index + 1}. ${q.question}</div>
+                        <div class="options-list">
+                `;
+                q.options.forEach(opt => {
+                    htmlContent += `
+                        <label class="option-item" style="cursor: pointer;">
+                            <input type="radio" name="q${q.id}" value="${opt}" required style="accent-color: var(--accent-blue);">
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+                htmlContent += `</div></div>`;
+            });
+            container.innerHTML = htmlContent;
+
+            let timerSeconds = examDurationMinutes * 60;
+            const timerDisplay = document.getElementById('time-left');
+            timerInterval = setInterval(() => {
+                let m = Math.floor(timerSeconds / 60);
+                let s = timerSeconds % 60;
+                timerDisplay.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('quiz-form').dispatchEvent(new Event('submit'));
+                }
+                timerSeconds--;
+            }, 1000);
+        }
+
+        function showReviewScreen(savedAnswers, examTitleStr, earnedScore, totalScoreVal) {
+            document.getElementById('preview-box').style.display = 'none';
+            document.getElementById('no-exam-box').style.display = 'none';
+            document.getElementById('exam-box').style.display = 'none';
+            document.getElementById('result-box').style.display = 'block';
+
+            document.getElementById('result-main-title').innerText = `نتيجة اختبار: ${examTitleStr}`;
+            document.getElementById('score-details').innerText = `لقد حصلت على ${earnedScore} نقطة من إجمالي ${totalScoreVal} درجة.`;
+
+            let reviewHtml = "";
+            examQuestions.forEach((q, index) => {
+                let studentChoice = savedAnswers[`q${q.id}`] || "لم تقم بالإجابة";
+                let isCorrect = studentChoice === q.correct;
+
+                reviewHtml += `
+                    <div class="question-box" style="border-color: ${isCorrect ? 'var(--accent-green)' : 'var(--accent-red)'};">
+                        <div class="question-text">${index + 1}. ${q.question}</div>
+                        <div class="options-list">
+                            <div class="option-item" style="background: ${isCorrect ? 'rgba(63,185,80,0.1)' : 'rgba(248,81,73,0.1)'};">
+                                <span>إجابتك: <strong>${studentChoice}</strong> ${isCorrect ? '✅' : '❌'}</span>
+                            </div>
+                            ${!isCorrect ? `<div class="option-item"><span>الإجابة الصحيحة: <strong style="color: var(--accent-green);">${q.correct}</strong></span></div>` : ''}
+                        </div>
+                        <div class="explanation-box">
+                            <i class="fa-solid fa-circle-info"></i> <strong>الشرح التعليمي:</strong> ${q.explanation}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('review-container').innerHTML = reviewHtml;
+        }
+
+        document.getElementById('quiz-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (timerInterval) clearInterval(timerInterval);
+
+            let examScore = 0;
+            let answersObj = {};
+            let totalPossible = examQuestions.length * 10;
+
+            examQuestions.forEach(q => {
+                let selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+                let val = selected ? selected.value : "";
+                answersObj[`q${q.id}`] = val;
+                if (val === q.correct) examScore += 10;
+            });
+
+            try {
+                const phone = sessionStorage.getItem("studentPhone");
+                const studentRef = doc(db, "students", phone);
+
+                const examRecord = {
+                    examId: currentActiveExamId,
+                    examTitle: currentExamTitle,
+                    score: examScore,
+                    totalScore: totalPossible,
+                    answers: answersObj,
+                    submittedAt: new Date().toISOString()
+                };
+
+                await updateDoc(studentRef, {
+                    points: increment(examScore),
+                    examCompleted: true,
+                    completedExams: arrayUnion(examRecord)
+                });
+
+                showReviewScreen(answersObj, currentExamTitle, examScore, totalPossible);
+            } catch (error) {
+                console.error(error);
+                alert("حدث خطأ أثناء حفظ النتيجة.");
+            }
+        });
+    </script>
+</body>
+</html>

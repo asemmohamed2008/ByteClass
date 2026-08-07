@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByteClass | لوحة تحكم الأدمن الشاملة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/png" href="images/image.png">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --surface-color: #161b22;
+            --surface-hover: #21262d;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-gold: #d4af37;
+            --text-main: #f0f6fc;
+            --text-dim: #8b949e;
+            --border-color: #30363d;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { font-family: 'Fira Code', monospace; font-size: 22px; font-weight: 700; color: var(--accent-red); text-decoration: none; }
+        .logo span { color: var(--accent-blue); }
+
+        .main-container { max-width: 1300px; margin: 0 auto; padding: 30px 20px; width: 100%; }
+
+        .section-box {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .section-header h2 { font-size: 18px; display: flex; align-items: center; gap: 10px; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-label { font-size: 13px; color: var(--text-dim); }
+        .form-input, .form-select {
+            background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 10px 14px; border-radius: 10px; font-family: 'Cairo', sans-serif; font-size: 14px;
+        }
+        .form-input:focus, .form-select:focus { border-color: var(--accent-blue); outline: none; }
+
+        .question-builder-box {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .remove-q-btn {
+            position: absolute; top: 15px; left: 15px; background: rgba(248,81,73,0.1);
+            color: var(--accent-red); border: 1px solid rgba(248,81,73,0.3); padding: 5px 10px;
+            border-radius: 8px; cursor: pointer; font-size: 12px; font-family: 'Cairo', sans-serif;
+        }
+        .remove-q-btn:hover { background: var(--accent-red); color: #fff; }
+
+        .btn-main {
+            background: var(--accent-green); color: #fff; border: none; padding: 12px 20px;
+            border-radius: 10px; font-weight: 700; cursor: pointer; font-family: 'Cairo', sans-serif;
+            display: flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition);
+        }
+        .btn-main:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        .btn-secondary {
+            background: var(--surface-hover); color: var(--accent-blue); border: 1px solid var(--border-color);
+            padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; font-family: 'Cairo', sans-serif;
+            display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); margin-bottom: 15px;
+        }
+        .btn-secondary:hover { border-color: var(--accent-blue); }
+
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 14px; }
+        th, td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); }
+        th { background: var(--surface-hover); color: var(--text-dim); font-weight: 700; }
+        tr:hover { background: rgba(255, 255, 255, 0.02); }
+
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+        .badge-gold { background: rgba(212, 175, 55, 0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold); }
+        .badge-blue { background: rgba(88, 166, 255, 0.1); color: var(--accent-blue); }
+        .badge-draft { background: rgba(212, 175, 55, 0.1); color: var(--accent-gold); border: 1px solid rgba(212, 175, 55, 0.3); }
+        .badge-published { background: rgba(63, 185, 80, 0.1); color: var(--accent-green); border: 1px solid rgba(63, 185, 80, 0.3); }
+
+        .action-btns { display: flex; gap: 8px; }
+        .btn-action {
+            background: var(--surface-hover); border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: var(--transition);
+        }
+        .btn-action:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+        .btn-delete { color: var(--accent-red); border-color: rgba(248, 81, 73, 0.3); }
+        .btn-delete:hover { background: rgba(248, 81, 73, 0.1); border-color: var(--accent-red); color: var(--accent-red); }
+        .btn-publish { color: var(--accent-green); border-color: rgba(63, 185, 80, 0.3); }
+        .btn-publish:hover { background: rgba(63, 185, 80, 0.1); border-color: var(--accent-green); color: var(--accent-green); }
+
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); z-index: 2000; justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-content {
+            background: var(--surface-color); border: 1px solid var(--border-color);
+            border-radius: 20px; width: 100%; max-width: 800px; max-height: 85vh; overflow-y: auto; padding: 30px;
+            position: relative;
+        }
+        .close-modal { position: absolute; top: 20px; left: 20px; font-size: 20px; color: var(--text-dim); cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#" class="logo"><i class="fa-solid fa-shield-halved"></i> Byte<span>Admin</span></a>
+        <a href="login.html" style="color: var(--accent-red); text-decoration: none; font-size: 14px;"><i class="fa-solid fa-right-from-bracket"></i> خروج الأدمن</a>
+    </nav>
+
+    <div class="main-container">
+
+        <div class="section-box">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-video" style="color: var(--accent-blue);"></i> إدارة مواعيد ورابط محاضرات الزوم الحية</h2>
+            </div>
+            <form id="zoom-form">
+                <div class="form-grid" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">اختر الصف الدراسي</label>
+                        <select id="zoom-grade" class="form-select" required>
+                            <option value="1-sec">الصف الأول الثانوي</option>
+                            <option value="2-sec">الصف الثاني الثانوي</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">نص الموعد (مثال: السبت القادم الساعة 8 مساءً)</label>
+                        <input type="text" id="zoom-timetext" class="form-input" placeholder="أدخل وقت المحاضرة..." required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">رابط اجتماع الزوم (Zoom Link)</label>
+                        <input type="url" id="zoom-link" class="form-input" placeholder="https://zoom.us/..." required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-main"><i class="fa-solid fa-floppy-disk"></i> حفظ ونشر رابط الموعد للطلاب</button>
+            </form>
+        </div>
+
+        <div class="section-box">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-folder-open" style="color: var(--accent-blue);"></i> إدارة المسودات والامتحانات (تعديل، حذف، ونشر)</h2>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                <button onclick="fetchAdminExams('1-sec')" class="btn-action" style="padding: 10px 20px; font-weight: 700;"><i class="fa-solid fa-graduation-cap"></i> الصف الأول الثانوي</button>
+                <button onclick="fetchAdminExams('2-sec')" class="btn-action" style="padding: 10px 20px; font-weight: 700;"><i class="fa-solid fa-graduation-cap"></i> الصف الثاني الثانوي</button>
+            </div>
+            <div id="admin-exams-list-container" style="display: flex; flex-direction: column; gap: 10px;">
+                <p style="color: var(--text-dim); font-size: 14px;">اختر الصف من الأزرار بالأعلى لعرض وإدارة امتحاناته...</p>
+            </div>
+        </div>
+
+        <div class="section-box">
+            <div class="section-header">
+                <h2 id="form-section-title"><i class="fa-solid fa-cloud-arrow-up" style="color: var(--accent-blue);"></i> تصميم وحفظ امتحان جديد كمسودة</h2>
+            </div>
+            <form id="create-exam-form">
+                <input type="hidden" id="editing-exam-id" value="">
+                <div class="form-grid" style="margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label class="form-label">الصف الدراسي المستهدف</label>
+                        <select id="exam-grade" class="form-select" required>
+                            <option value="1-sec">الصف الأول الثانوي</option>
+                            <option value="2-sec">الصف الثاني الثانوي</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">عنوان الامتحان</label>
+                        <input type="text" id="exam-title" class="form-input" placeholder="مثال: اختبار البرمجة الشامل" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">المدة الزمنية (بالدقائق)</label>
+                        <input type="number" id="exam-duration" class="form-input" value="5" min="1" required>
+                    </div>
+                </div>
+
+                <hr style="border-color: var(--border-color); margin-bottom: 20px;">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="font-size: 15px; color: var(--accent-blue);">أسئلة الاختبار</h3>
+                    <button type="button" class="btn-secondary" onclick="addQuestionField()"><i class="fa-solid fa-plus"></i> إضافة سؤال جديد</button>
+                </div>
+
+                <div id="questions-builder-container"></div>
+
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button type="submit" class="btn-main" style="flex: 1;"><i class="fa-solid fa-floppy-disk"></i> حفظ الامتحان كمسودة</button>
+                    <button type="button" id="cancel-edit-btn" class="btn-action" style="display: none; padding: 12px 20px;" onclick="cancelEditMode()">إلغاء التعديل</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="section-box">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-gift" style="color: var(--accent-gold);"></i> طلبات هدايا الأوائل (ومتابعة التسليم)</h2>
+            </div>
+            <div id="rewards-admin-list">
+                <p style="color: var(--text-dim); font-size: 14px;">جاري تحميل الهدايا...</p>
+            </div>
+        </div>
+
+        <div class="section-box">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-users-gear" style="color: var(--accent-blue);"></i> قاعدة بيانات الطلاب والمراتب</h2>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الترتيب</th>
+                            <th>اسم الطالب</th>
+                            <th>الصف</th>
+                            <th>النوع</th>
+                            <th>النقاط</th>
+                            <th>حالة الامتحان</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-table-body">
+                        <tr><td colspan="7" style="text-align: center; color: var(--text-dim);">جاري تحميل الطلاب...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="student-modal">
+        <div class="modal-content">
+            <i class="fa-solid fa-xmark close-modal" onclick="closeModal()"></i>
+            <h2 id="modal-student-name" style="margin-bottom: 15px; color: var(--accent-blue);">تفاصيل الطالب وسجل الامتحانات</h2>
+            <div id="modal-details-body"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, deleteDoc, setDoc, updateDoc, getDoc, query, where, addDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBESs1L-1OBtPQZzqZ6nTH-Waka3dWajMM",
+            authDomain: "byteclass-platform.firebaseapp.com",
+            projectId: "byteclass-platform",
+            storageBucket: "byteclass-platform.firebasestorage.app",
+            messagingSenderId: "933460563812",
+            appId: "1:933460563812:web:4215e97f147c92ce634c71",
+            measurementId: "G-0PCY6G9FMF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let questionCounter = 0;
+        let lastFetchedGrade = '1-sec';
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (sessionStorage.getItem("adminLoggedIn") !== "true") {
+                alert("يرجى تسجيل الدخول كأدمن أولاً!");
+                window.location.href = "login.html";
+                return;
+            }
+            addQuestionField();
+            await loadAdminData();
+        });
+
+        // 🚀 جلب الامتحانات (مسودات ومنشورة) وعرض أزرار التحكم
+        window.fetchAdminExams = async function(gradeCode) {
+            lastFetchedGrade = gradeCode;
+            const container = document.getElementById('admin-exams-list-container');
+            container.innerHTML = "<p style='color: var(--accent-blue); font-size: 14px;'>جاري جلب الامتحانات...</p>";
+
+            try {
+                const q = query(collection(db, "exams"), where("grade", "==", gradeCode));
+                const querySnapshot = await getDocs(q);
+
+                container.innerHTML = "";
+                if (querySnapshot.empty) {
+                    container.innerHTML = `<p style="color: var(--text-dim); font-size: 14px;">لا توجد امتحانات مسجلة لهذا الصف حتى الآن.</p>`;
+                    return;
+                }
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const examDocId = docSnap.id;
+                    const examTitle = data.title || "امتحان بدون عنوان";
+                    const duration = data.duration ? `${data.duration} دقائق` : "غير محدد";
+                    const isPublished = data.published === true;
+
+                    container.innerHTML += `
+                        <div style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <strong style="color: var(--text-main); font-size: 15px;"><i class="fa-solid fa-file-lines" style="color: var(--accent-blue); margin-left: 8px;"></i> ${examTitle}</strong>
+                                <br><small style="color: var(--text-dim);">المدة: ${duration} | الحالة: ${isPublished ? '<span class="badge badge-published">منشور للطلاب 🚀</span>' : '<span class="badge badge-draft">مسودة (غير منشور) 📝</span>'}</small>
+                            </div>
+                            <div class="action-btns">
+                                ${!isPublished ? `<button class="btn-action btn-publish" onclick="publishExam('${examDocId}')"><i class="fa-solid fa-rocket"></i> نشر</button>` : `<button class="btn-action" onclick="unpublishExam('${examDocId}')"><i class="fa-solid fa-eye-slash"></i> إلغاء النشر</button>`}
+                                <button class="btn-action" onclick="loadExamForEdit('${examDocId}', '${gradeCode}')"><i class="fa-solid fa-pen-to-square"></i> تعديل</button>
+                                <button class="btn-action btn-delete" onclick="deleteExam('${examDocId}')"><i class="fa-solid fa-trash"></i> حذف</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("خطأ:", error);
+                container.innerHTML = `<p style="color: var(--accent-red); font-size: 14px;">حدث خطأ أثناء جلب البيانات.</p>`;
+            }
+        };
+
+        // 🚀 نشر الامتحان للطلاب
+        window.publishExam = async function(examDocId) {
+            if (!confirm("هل أنت متأكد من رغبتك في نشر هذا الامتحان للطلاب الآن؟")) return;
+            try {
+                await updateDoc(doc(db, "exams", examDocId), { published: true });
+                alert("تم نشر الامتحان بنجاح للطلاب!");
+                fetchAdminExams(lastFetchedGrade);
+            } catch (e) {
+                console.error(e);
+                alert("حدث خطأ أثناء نشر الامتحان.");
+            }
+        };
+
+        // 🚀 إلغاء نشر الامتحان وإرجاعه كمسودة
+        window.unpublishExam = async function(examDocId) {
+            if (!confirm("هل تريد تحويل هذا الامتحان إلى مسودة وإخفائه عن الطلاب؟")) return;
+            try {
+                await updateDoc(doc(db, "exams", examDocId), { published: false });
+                alert("تم تحويل الامتحان إلى مسودة بنجاح.");
+                fetchAdminExams(lastFetchedGrade);
+            } catch (e) {
+                console.error(e);
+                alert("حدث خطأ.");
+            }
+        };
+
+        // 🚀 حذف الامتحان نهائياً
+        window.deleteExam = async function(examDocId) {
+            if (!confirm("هل أنت متأكد من حذف هذا الامتحان نهائياً؟")) return;
+            try {
+                await deleteDoc(doc(db, "exams", examDocId));
+                alert("تم حذف الامتحان بنجاح!");
+                fetchAdminExams(lastFetchedGrade);
+            } catch (e) {
+                console.error(e);
+                alert("حدث خطأ أثناء حذف الامتحان.");
+            }
+        };
+
+        // 🚀 تحميل بيانات الامتحان في الفورم للتعديل عليه
+        window.loadExamForEdit = async function(examDocId, gradeCode) {
+            try {
+                const docSnap = await getDoc(doc(db, "exams", examDocId));
+                if (!docSnap.exists()) return;
+                const data = docSnap.data();
+
+                document.getElementById('editing-exam-id').value = examDocId;
+                document.getElementById('exam-grade').value = data.grade;
+                document.getElementById('exam-title').value = data.title;
+                document.getElementById('exam-duration').value = data.duration;
+                document.getElementById('form-section-title').innerHTML = `<i class="fa-solid fa-pen-to-square" style="color: var(--accent-blue);"></i> تعديل الامتحان الحالي`;
+                document.getElementById('cancel-edit-btn').style.display = 'inline-block';
+
+                const container = document.getElementById('questions-builder-container');
+                container.innerHTML = "";
+                questionCounter = 0;
+
+                if (data.questions && data.questions.length > 0) {
+                    data.questions.forEach(q => {
+                        questionCounter++;
+                        const qDiv = document.createElement('div');
+                        qDiv.className = 'question-builder-box';
+                        qDiv.id = `q-box-${questionCounter}`;
+                        qDiv.innerHTML = `
+                            <button type="button" class="remove-q-btn" onclick="document.getElementById('q-box-${questionCounter}').remove()">حذف السؤال</button>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label class="form-label">نص السؤال رقم ${questionCounter}</label>
+                                <input type="text" class="form-input q-text" value="${q.question}" placeholder="اكتب السؤال هنا..." required>
+                            </div>
+                            <div class="form-grid" style="margin-bottom: 12px;">
+                                <div class="form-group"><label class="form-label">الخيار الأول</label><input type="text" class="form-input q-opt" value="${q.options[0] || ''}" placeholder="الخيار أ" required></div>
+                                <div class="form-group"><label class="form-label">الخيار الثاني</label><input type="text" class="form-input q-opt" value="${q.options[1] || ''}" placeholder="الخيار ب" required></div>
+                                <div class="form-group"><label class="form-label">الخيار الثالث</label><input type="text" class="form-input q-opt" value="${q.options[2] || ''}" placeholder="الخيار ج" required></div>
+                                <div class="form-group"><label class="form-label">الخيار الرابع</label><input type="text" class="form-input q-opt" value="${q.options[3] || ''}" placeholder="الخيار د" required></div>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">الإجابة الصحيحة (نص الخيار تماماً)</label>
+                                    <input type="text" class="form-input q-correct" value="${q.correct}" placeholder="يجب أن تطابق أحد الخيارات بدقة" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">الشرح التعليمي بعد الحل</label>
+                                    <input type="text" class="form-input q-exp" value="${q.explanation || ''}" placeholder="اشرح لماذا هذه هي الإجابة الصحيحة..." required>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(qDiv);
+                    });
+                }
+
+                window.scrollTo({ top: document.getElementById('create-exam-form').offsetTop - 50, behavior: 'smooth' });
+            } catch (e) {
+                console.error(e);
+                alert("حدث خطأ أثناء تحميل بيانات الامتحان للتعديل.");
+            }
+        };
+
+        window.cancelEditMode = function() {
+            document.getElementById('editing-exam-id').value = "";
+            document.getElementById('create-exam-form').reset();
+            document.getElementById('questions-builder-container').innerHTML = "";
+            questionCounter = 0;
+            addQuestionField();
+            document.getElementById('form-section-title').innerHTML = `<i class="fa-solid fa-cloud-arrow-up" style="color: var(--accent-blue);"></i> تصميم وحفظ امتحان جديد كمسودة`;
+            document.getElementById('cancel-edit-btn').style.display = 'none';
+        };
+
+        // حفظ تفاصيل ورابط الزوم
+        document.getElementById('zoom-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const grade = document.getElementById('zoom-grade').value;
+            const timeText = document.getElementById('zoom-timetext').value;
+            const link = document.getElementById('zoom-link').value;
+
+            try {
+                await setDoc(doc(db, "settings", `zoom_${grade}`), {
+                    timeText,
+                    link,
+                    updatedAt: new Date().toISOString()
+                });
+                alert("تم تحديث ونشر رابط وموعد الزوم لهذا الصف بنجاح!");
+            } catch (error) {
+                console.error(error);
+                alert("حدث خطأ أثناء حفظ موعد الزوم.");
+            }
+        });
+
+        window.addQuestionField = function() {
+            questionCounter++;
+            const container = document.getElementById('questions-builder-container');
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-builder-box';
+            qDiv.id = `q-box-${questionCounter}`;
+            qDiv.innerHTML = `
+                <button type="button" class="remove-q-btn" onclick="document.getElementById('q-box-${questionCounter}').remove()">حذف السؤال</button>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label">نص السؤال رقم ${questionCounter}</label>
+                    <input type="text" class="form-input q-text" placeholder="اكتب السؤال هنا..." required>
+                </div>
+                <div class="form-grid" style="margin-bottom: 12px;">
+                    <div class="form-group"><label class="form-label">الخيار الأول</label><input type="text" class="form-input q-opt" placeholder="الخيار أ" required></div>
+                    <div class="form-group"><label class="form-label">الخيار الثاني</label><input type="text" class="form-input q-opt" placeholder="الخيار ب" required></div>
+                    <div class="form-group"><label class="form-label">الخيار الثالث</label><input type="text" class="form-input q-opt" placeholder="الخيار ج" required></div>
+                    <div class="form-group"><label class="form-label">الخيار الرابع</label><input type="text" class="form-input q-opt" placeholder="الخيار د" required></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">الإجابة الصحيحة (نص الخيار تماماً)</label>
+                        <input type="text" class="form-input q-correct" placeholder="يجب أن تطابق أحد الخيارات بدقة" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الشرح التعليمي بعد الحل</label>
+                        <input type="text" class="form-input q-exp" placeholder="اشرح لماذا هذه هي الإجابة الصحيحة..." required>
+                    </div>
+                </div>
+            `;
+            container.appendChild(qDiv);
+        };
+
+        // 🚀 حفظ أو تعديل الامتحان (يحفظ كمسودة افتراضياً حتى تضغط نشر)
+        document.getElementById('create-exam-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editingId = document.getElementById('editing-exam-id').value;
+            const grade = document.getElementById('exam-grade').value;
+            const title = document.getElementById('exam-title').value;
+            const duration = parseInt(document.getElementById('exam-duration').value);
+
+            const questionBoxes = document.querySelectorAll('.question-builder-box');
+            if (questionBoxes.length === 0) {
+                alert("يرجى إضافة سؤال واحد على الأقل للاختبار!");
+                return;
+            }
+
+            let questionsList = [];
+            let isValid = true;
+
+            questionBoxes.forEach((box, index) => {
+                const qText = box.querySelector('.q-text').value.trim();
+                const optInputs = box.querySelectorAll('.q-opt');
+                const correct = box.querySelector('.q-correct').value.trim();
+                const explanation = box.querySelector('.q-exp').value.trim();
+
+                let options = [];
+                optInputs.forEach(opt => options.push(opt.value.trim()));
+
+                if (!options.includes(correct)) {
+                    alert(`السؤال رقم ${index + 1}: الإجابة الصحيحة يجب أن تكون مطابقة تماماً لأحد الخيارات الأربعة المدخلة!`);
+                    isValid = false;
+                    return;
+                }
+
+                questionsList.push({
+                    id: index + 1,
+                    question: qText,
+                    options: options,
+                    correct: correct,
+                    explanation: explanation
+                });
+            });
+
+            if (!isValid) return;
+
+            try {
+                if (editingId) {
+                    // تحديث امتحان قائم
+                    await updateDoc(doc(db, "exams", editingId), {
+                        grade,
+                        title,
+                        duration,
+                        questions: questionsList,
+                        updatedAt: new Date().toISOString()
+                    });
+                    alert("تم تحديث الامتحان وحفظ التعديلات بنجاح!");
+                    cancelEditMode();
+                } else {
+                    // إنشاء امتحان جديد كمسودة (published: false)
+                    await addDoc(collection(db, "exams"), {
+                        grade: grade,
+                        examId: "exam_" + Date.now(),
+                        title,
+                        duration,
+                        questions: questionsList,
+                        published: false, // مسودة افتراضياً
+                        createdAt: new Date().toISOString()
+                    });
+                    alert("تم حفظ الامتحان كمسودة بنجاح! لن يظهر للطلاب إلا بعد الضغط على زر (نشر).");
+                    document.getElementById('create-exam-form').reset();
+                    document.getElementById('questions-builder-container').innerHTML = "";
+                    questionCounter = 0;
+                    addQuestionField();
+                }
+                fetchAdminExams(grade);
+            } catch (error) {
+                console.error(error);
+                alert("حدث خطأ أثناء حفظ الامتحان.");
+            }
+        });
+
+        async function loadAdminData() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "students"));
+                let students = [];
+                querySnapshot.forEach(docSnap => {
+                    students.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                students.sort((a, b) => (b.points || 0) - (a.points || 0));
+
+                const tableBody = document.getElementById('students-table-body');
+                const rewardsList = document.getElementById('rewards-admin-list');
+
+                if (students.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center;">لا يوجد طلاب.</td></tr>`;
+                    rewardsList.innerHTML = `<p style="color: var(--text-dim);">لا توجد طلبات هدايا.</p>`;
+                    return;
+                }
+
+                let tableHtml = "";
+                let rewardsHtml = "";
+                let hasRewards = false;
+
+                students.forEach((st, index) => {
+                    let rankBadge = `#${index + 1}`;
+                    if (index === 0) rankBadge = `<span class="badge badge-gold">🏆 المركز الأول</span>`;
+
+                    let gradeText = st.grade === "1-sec" ? "أولى ثانوي" : "تانية ثانوي";
+                    let genderText = st.gender === "female" ? "بنت 👧" : "ولد 👦";
+
+                    tableHtml += `
+                        <tr>
+                            <td><strong>${rankBadge}</strong></td>
+                            <td>${st.fullName} <br><small style="color:var(--text-dim);">${st.phone}</small></td>
+                            <td>${gradeText}</td>
+                            <td>${genderText}</td>
+                            <td><strong style="color: var(--accent-green);">${st.points || 0}</strong> نقطة</td>
+                            <td>${st.examCompleted ? '<span class="badge badge-blue">امتحن ✅</span>' : '<span style="color:var(--text-dim);">لم يمتَحِن</span>'}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-action" onclick='viewStudentDetails(${JSON.stringify(st)})'>
+                                        <i class="fa-solid fa-eye"></i> التفاصيل
+                                    </button>
+                                    <button class="btn-action btn-delete" onclick="deleteStudent('${st.phone}', '${st.fullName}')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+
+                    if (st.rewardClaimed) {
+                        hasRewards = true;
+                        let isDelivered = st.rewardDelivered === true;
+                        rewardsHtml += `
+                            <div style="background:var(--bg-color); border:1px solid var(--border-color); padding:12px 16px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <strong>${st.fullName}</strong> (${gradeText}) اختار: <span style="color:var(--accent-gold); font-weight:700;">${st.chosenReward}</span>
+                                    <br><small style="color:var(--text-dim);">هاتف: ${st.phone}</small>
+                                </div>
+                                <div>
+                                    ${isDelivered ?
+                                        '<span class="badge" style="background:rgba(63,185,80,0.15); color:var(--accent-green);">تم التسليم ✅</span>' :
+                                        `<button class="btn-action" style="background:var(--accent-green); color:#fff; border:none;" onclick="markRewardDelivered('${st.phone}')">تأكيد تسليم الهدية</button>`
+                                    }
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                tableBody.innerHTML = tableHtml;
+                rewardsList.innerHTML = hasRewards ? rewardsHtml : `<p style="color: var(--text-dim);">لم يختار أي طالب هدية بعد.</p>`;
+
+            } catch (error) {
+                console.error("خطأ:", error);
+            }
+        }
+
+        window.markRewardDelivered = async function(phone) {
+            try {
+                await updateDoc(doc(db, "students", phone), { rewardDelivered: true });
+                alert("تم تحديث حالة الهدية إلى (تم التسليم) بنجاح!");
+                loadAdminData();
+            } catch (e) {
+                alert("حدث خطأ أثناء التحديث.");
+            }
+        }
+
+        window.viewStudentDetails = async function(student) {
+            document.getElementById('modal-student-name').innerText = `تفاصيل الطالب وسجل الامتحانات: ${student.fullName}`;
+            const body = document.getElementById('modal-details-body');
+            body.innerHTML = `<p style="color: var(--text-dim); text-align: center; padding: 20px;">جاري تحميل تفاصيل وسجل الامتحانات...</p>`;
+            document.getElementById('student-modal').style.display = 'flex';
+
+            const completedExams = student.completedExams || [];
+
+            if (completedExams.length === 0) {
+                body.innerHTML = `<p style="color: var(--text-dim); text-align: center; padding: 20px;">لم يقم الطالب بأداء أي اختبارات سابقة حتى الآن.</p>`;
+                return;
+            }
+
+            let html = `
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; background: var(--bg-color); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+                    <div><strong>الهاتف:</strong> ${student.phone}</div>
+                    <div><strong>إجمالي النقاط:</strong> <span style="color:var(--accent-green);">${student.points || 0}</span></div>
+                    <div><strong>الصف:</strong> ${student.grade === '1-sec' ? 'أولى ثانوي' : 'تانية ثانوي'}</div>
+                </div>
+                <h3 style="margin-bottom: 15px; color: var(--accent-blue); font-size: 16px;"><i class="fa-solid fa-list-check"></i> سجل الامتحانات وتصحيح الأسئلة:</h3>
+            `;
+
+            try {
+                // جلب الامتحانات المنشورة الخاصة بصف الطالب
+                const qExams = query(collection(db, "exams"), where("grade", "==", student.grade));
+                const examSnapshot = await getDocs(qExams);
+                let examQuestionsMap = {};
+                examSnapshot.forEach(docSnap => {
+                    let d = docSnap.data();
+                    if (d.questions) {
+                        d.questions.forEach(q => {
+                            examQuestionsMap[q.id] = q;
+                        });
+                    }
+                });
+
+                completedExams.forEach((ex, idx) => {
+                    html += `
+                        <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px; margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                                <strong style="color: var(--accent-blue); font-size: 16px;">${idx + 1}. ${ex.examTitle || 'اختبار أونلاين'}</strong>
+                                <span class="badge" style="background: rgba(63,185,80,0.15); color: var(--accent-green); font-family: 'Fira Code', monospace; font-size: 14px;">الدرجة: ${ex.score} / ${ex.totalScore}</span>
+                            </div>
+                    `;
+
+                    const savedAnswers = ex.answers || {};
+                    let qKeys = Object.keys(savedAnswers);
+
+                    if (qKeys.length === 0) {
+                        html += `<p style="color: var(--text-dim); font-size: 13px;">لا توجد تفاصيل إجابات مسجلة لهذا الاختبار.</p>`;
+                    } else {
+                        qKeys.forEach((key, qIdx) => {
+                            let qId = key.replace('q', '');
+                            let q = examQuestionsMap[qId] || { question: `السؤال رقم ${qId}`, correct: "غير متوفر", explanation: "غير متوفر" };
+                            let studentChoice = savedAnswers[key];
+                            let isCorrect = studentChoice === q.correct;
+
+                            html += `
+                                <div style="background: var(--surface-color); border: 1px solid ${isCorrect ? 'rgba(63,185,80,0.3)' : 'rgba(248,81,73,0.3)'}; border-radius: 10px; padding: 12px; margin-bottom: 10px;">
+                                    <div style="font-weight: 700; font-size: 14px; margin-bottom: 8px;">${qIdx + 1}. ${q.question}</div>
+                                    <div style="font-size: 13px; margin-bottom: 4px;">
+                                        إجابة الطالب: <strong style="color: ${isCorrect ? 'var(--accent-green)' : 'var(--accent-red)'};">${studentChoice}</strong> ${isCorrect ? '✅' : '❌'}
+                                    </div>
+                                    ${!isCorrect ? `<div style="font-size: 13px; color: var(--accent-green); margin-bottom: 4px;">الإجابة الصحيحة: <strong>${q.correct}</strong></div>` : ''}
+                                    <div style="font-size: 12px; color: var(--text-dim); margin-top: 6px; border-right: 2px solid var(--accent-blue); padding-right: 8px;">
+                                        <strong>الشرح:</strong> ${q.explanation}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    html += `</div>`;
+                });
+
+            } catch (err) {
+                console.error(err);
+                html += `<p style="color: var(--accent-red);">حدث خطأ أثناء جلب تفاصيل الأسئلة للطالب.</p>`;
+            }
+
+            body.innerHTML = html;
+        }
+
+        window.closeModal = function() {
+            document.getElementById('student-modal').style.display = 'none';
+        }
+
+        window.deleteStudent = async function(phone, name) {
+            if (!confirm(`هل أنت متأكد من حذف الطالب (${name}) نهائياً؟`)) return;
+            try {
+                await deleteDoc(doc(db, "students", phone));
+                alert(`تم حذف الطالب ${name} بنجاح.`);
+                loadAdminData();
+            } catch (e) {
+                alert("خطأ أثناء الحذف.");
+            }
+        }
+    </script>
+</body>
+</html>

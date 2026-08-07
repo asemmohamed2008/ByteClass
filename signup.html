@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByteClass | إنشاء حساب جديد للطالب</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/png" href="images/image.png">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --surface-color: rgba(17, 24, 39, 0.75);
+            --surface-hover: rgba(31, 41, 55, 0.85);
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --text-main: #f3f4f6;
+            --text-dim: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            /* خلفية تفاعلية بلمسات جمالية مذهلة */
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.12) 0%, transparent 40%);
+            color: var(--text-main);
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 520px;
+            background: var(--surface-color);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            font-family: 'Fira Code', monospace;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .logo span {
+            color: var(--accent-green);
+        }
+
+        .logo-area p {
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            right: 15px;
+            color: var(--text-dim);
+            font-size: 15px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            background-color: rgba(11, 15, 25, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 45px 12px 15px;
+            color: var(--text-main);
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-select {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background-color: rgba(11, 15, 25, 0.9);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: var(--accent-blue);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .submit-btn:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .footer-note a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-note a:hover {
+            text-decoration: underline;
+        }
+
+        /* نظام الإشعارات العصرية (Toast Notifications) */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .custom-toast {
+            background-color: #161b22;
+            color: #f0f6fc;
+            border: 1px solid #30363d;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 280px;
+            transform: translateX(-120%);
+            animation: slideIn 0.3s forwards cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .custom-toast.success { border-right: 4px solid #3fb950; }
+        .custom-toast.error { border-right: 4px solid #f85149; }
+        .custom-toast i { font-size: 18px; }
+        .custom-toast.success i { color: #3fb950; }
+        .custom-toast.error i { color: #f85149; }
+
+        @keyframes slideIn { to { transform: translateX(0); } }
+        @keyframes slideOut { to { transform: translateX(-120%); opacity: 0; } }
+
+        @media (max-width: 480px) {
+            .auth-container { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="logo-area">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-code"></i> Byte<span>Class</span>
+            </a>
+            <p>سجل بياناتك وأنشئ حسابك على المنصة</p>
+        </div>
+
+        <form id="signup-form">
+            <div class="form-group">
+                <label class="form-label">الاسم الثلاثي للطالب</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="signup-name" class="form-input" placeholder="مثال: أحمد محمد علي" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">رقم هاتف الطالب (11 رقم)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <input type="tel" id="signup-phone" class="form-input" placeholder="01xxxxxxxxx" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">الصف الدراسي</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <select id="signup-grade" class="form-select" required>
+                        <option value="" disabled selected>اختر صفك الدراسي</option>
+                        <option value="1-sec">الصف الأول الثانوي</option>
+                        <option value="2-sec">الصف الثاني الثانوي</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">نوع الطالب</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-venus-mars"></i>
+                    <select id="signup-gender" class="form-select" required>
+                        <option value="" disabled selected>اختر النوع</option>
+                        <option value="male">ذكر (ولد)</option>
+                        <option value="female">أنثى (بنت)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">رقم هاتف ولي الأمر (11 رقم)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" id="signup-parent" class="form-input" placeholder="01xxxxxxxxx" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">كلمة المرور الخاصة بالحساب</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="signup-password" class="form-input" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">مفتاح التفعيل (Serial Key)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-key"></i>
+                    <input type="text" id="signup-key" class="form-input" placeholder="أدخل المفتاح المستلم من المعلم" required>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fa-solid fa-circle-chevron-left"></i> تفعيل الحساب ودخول المنصة
+            </button>
+        </form>
+
+        <div class="footer-note">
+            لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a>
+        </div>
+    </div>
+
+    <script>
+        // دالة الإشعارات العصرية
+        function showToast(message, type = 'success') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${type}`;
+            const iconClass = type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+
+            toast.innerHTML = `<i class="${iconClass}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s forwards cubic-bezier(0.4, 0, 0.2, 1)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBESs1L-1OBtPQZzqZ6nTH-Waka3dWajMM",
+            authDomain: "byteclass-platform.firebaseapp.com",
+            projectId: "byteclass-platform",
+            storageBucket: "byteclass-platform.firebasestorage.app",
+            messagingSenderId: "933460563812",
+            appId: "1:933460563812:web:4215e97f147c92ce634c71",
+            measurementId: "G-0PCY6G9FMF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const signupForm = document.getElementById('signup-form');
+
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fullName = document.getElementById('signup-name').value.trim();
+            const phone = document.getElementById('signup-phone').value.trim();
+            const grade = document.getElementById('signup-grade').value;
+            const gender = document.getElementById('signup-gender').value;
+            const parentPhone = document.getElementById('signup-parent').value.trim();
+            const password = document.getElementById('signup-password').value.trim();
+            const serialKey = document.getElementById('signup-key').value.trim();
+
+            // التحقق النهائي من طول أرقام الهواتف (11 رقم بالضبط)
+            if (phone.length !== 11) {
+                showToast("رقم هاتف الطالب يجب أن يكون 11 رقماً بالضبط!", "error");
+                return;
+            }
+
+            if (parentPhone.length !== 11) {
+                showToast("رقم هاتف ولي الأمر يجب أن يكون 11 رقماً بالضبط!", "error");
+                return;
+            }
+
+            try {
+                // 1. التحقق من صحة مفتاح التفعيل
+                const keyRef = doc(db, "serialKeys", serialKey);
+                const keySnap = await getDoc(keyRef);
+
+                if (!keySnap.exists()) {
+                    showToast("مفتاح التفعيل غير صحيح! تأكد من المفتاح.", "error");
+                    return;
+                }
+
+                if (keySnap.data().isUsed === true) {
+                    showToast("عذراً، هذا المفتاح تم استخدامه من قبل!", "error");
+                    return;
+                }
+
+                // 2. التحقق إن رقم الهاتف مش مسجل قبل كده
+                const studentRef = doc(db, "students", phone);
+                const studentSnap = await getDoc(studentRef);
+
+                if (studentSnap.exists()) {
+                    showToast("رقم هاتف الطالب مسجل مسبقاً!", "error");
+                    return;
+                }
+
+                // 3. حفظ بيانات الطالب في Firestore
+                await setDoc(studentRef, {
+                    fullName,
+                    phone,
+                    grade,
+                    gender,
+                    parentPhone,
+                    password,
+                    serialKey,
+                    points: 0,
+                    examCompleted: false,
+                    createdAt: new Date().toISOString()
+                });
+
+                // 4. تحديث حالة المفتاح
+                await setDoc(keyRef, { isUsed: true, usedBy: phone }, { merge: true });
+
+                showToast("تم إنشاء حسابك وتفعيله بنجاح يا مبرمج! 🎉", "success");
+                sessionStorage.setItem("studentPhone", phone);
+
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 1500);
+
+            } catch (error) {
+                console.error("خطأ أثناء التسجيل: ", error);
+                showToast("حدث خطأ في الاتصال بقاعدة البيانات.", "error");
+            }
+        });
+    </script>
+</body>
+</html>

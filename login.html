@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByteClass | تسجيل الدخول</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/png" href="images/image.png">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --surface-color: #111827;
+            --surface-hover: #1f2937;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --text-main: #f3f4f6;
+            --text-dim: #9ca3af;
+            --border-color: #1f2937;
+            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 440px;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-family: 'Fira Code', monospace;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .logo span {
+            color: var(--accent-green);
+        }
+
+        .logo-area p {
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            right: 15px;
+            color: var(--text-dim);
+            font-size: 15px;
+        }
+
+        .form-input {
+            width: 100%;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 45px 12px 15px;
+            color: var(--text-main);
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: var(--accent-green);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .footer-note a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-note a:hover {
+            text-decoration: underline;
+        }
+
+        /* نظام الإشعارات العصرية (Toast Notifications) */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .custom-toast {
+            background-color: #161b22;
+            color: #f0f6fc;
+            border: 1px solid #30363d;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 280px;
+            transform: translateX(-120%);
+            animation: slideIn 0.3s forwards cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .custom-toast.success { border-right: 4px solid #3fb950; }
+        .custom-toast.error { border-right: 4px solid #f85149; }
+        .custom-toast i { font-size: 18px; }
+        .custom-toast.success i { color: #3fb950; }
+        .custom-toast.error i { color: #f85149; }
+
+        @keyframes slideIn { to { transform: translateX(0); } }
+        @keyframes slideOut { to { transform: translateX(-120%); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="logo-area">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-code"></i> Byte<span>Class</span>
+            </a>
+            <p>تسجيل الدخول إلى لوحة تحكم الطالب</p>
+        </div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label class="form-label">رقم هاتف الطالب</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <input type="tel" id="login-phone" class="form-input" placeholder="01xxxxxxxxx" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">كلمة المرور</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fa-solid fa-right-to-bracket"></i> دخول المنصة
+            </button>
+        </form>
+
+        <div class="footer-note">
+            ليس لديك حساب بعد؟ <a href="signup.html">إنشاء حساب جديد</a>
+        </div>
+    </div>
+    <script>
+        // دالة الإشعارات العصرية
+        function showToast(message, type = 'success') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${type}`;
+            const iconClass = type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+
+            toast.innerHTML = `<i class="${iconClass}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s forwards cubic-bezier(0.4, 0, 0.2, 1)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBESs1L-1OBtPQZzqZ6nTH-Waka3dWajMM",
+            authDomain: "byteclass-platform.firebaseapp.com",
+            projectId: "byteclass-platform",
+            storageBucket: "byteclass-platform.firebasestorage.app",
+            messagingSenderId: "933460563812",
+            appId: "1:933460563812:web:4215e97f147c92ce634c71",
+            measurementId: "G-0PCY6G9FMF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const loginForm = document.getElementById('login-form');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const phone = document.getElementById('login-phone').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            // فحص صلاحيات الأدمن السرية أولاً
+            if (phone === "01121208129" && password === "Asem@@@2008") {
+                showToast("أهلاً بك يا عصوم 🛡️", "success");
+                sessionStorage.setItem("adminLoggedIn", "true");
+                setTimeout(() => {
+                    window.location.href = "admin.html";
+                }, 1500);
+                return;
+            }
+
+            try {
+                const studentRef = doc(db, "students", phone);
+                const studentSnap = await getDoc(studentRef);
+
+                if (!studentSnap.exists()) {
+                    showToast("رقم الهاتف غير مسجل! أنشئ حساباً جديداً.", "error");
+                    return;
+                }
+
+                const studentData = studentSnap.data();
+
+                if (studentData.password !== password) {
+                    showToast("كلمة المرور غير صحيحة، حاول مرة أخرى.", "error");
+                    return;
+                }
+
+                showToast(`أهلاً بك يا ${studentData.fullName} 🎉`, "success");
+                sessionStorage.setItem("studentPhone", phone);
+
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 1500);
+
+            } catch (error) {
+                console.error("خطأ في تسجيل الدخول: ", error);
+                showToast("حدث خطأ في الاتصال بقاعدة البيانات.", "error");
+            }
+        });
+    </script>
+</body>
+</html>
