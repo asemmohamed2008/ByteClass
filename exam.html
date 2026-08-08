@@ -215,7 +215,7 @@
         <div class="empty-state-card">
             <i class="fa-solid fa-circle-exclamation" style="font-size: 50px; color: var(--accent-blue); margin-bottom: 15px;"></i>
             <h3 style="font-size: 18px; margin-bottom: 10px; color: var(--text-main);">لا توجد اختبارات جديدة متاحة للحل حالياً</h3>
-            <p style="color: var(--text-dim); font-size: 14px; margin-bottom: 15px;">لقد أتممت هذا الاختبار من قبل. يمكنك مراجعة نتيجته من سجل لوحة التحكم الرئيسية.</p>
+            <p style="color: var(--text-dim); font-size: 14px; margin-bottom: 15px;">لقد أتممت هذا الاختبار من قبل أو لا يوجد امتحان منشور حالياً.</p>
 
             <a href="dashboard.html" class="back-dashboard-btn">
                 <i class="fa-solid fa-house-chimney"></i> العودة إلى لوحة التحكم الرئيسية
@@ -255,7 +255,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, updateDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc, increment, arrayUnion, query, collection, where, getDocs } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBESs1L-1OBtPQZzqZ6nTH-Waka3dWajMM",
@@ -290,16 +290,24 @@
 
                 const studentData = studentSnap.data();
 
-                // جلب امتحان الصف من السحابة
-                const examSnap = await getDoc(doc(db, "exams", studentData.grade));
+                // 🚀 جلب أحدث امتحان منشور يخص صف الطالب من السحابة
+                const examsQuery = query(
+                    collection(db, "exams"),
+                    where("grade", "==", studentData.grade),
+                    where("published", "==", true)
+                );
+                const examSnapshot = await getDocs(examsQuery);
 
-                if (!examSnap.exists()) {
+                if (examSnapshot.empty) {
                     document.getElementById('no-exam-box').style.display = 'block';
                     return;
                 }
 
-                const examData = examSnap.data();
-                currentActiveExamId = examData.examId || "exam_v1";
+                // اختيار أول امتحان منشور متاح لهذا الصف
+                const examDocSnap = examSnapshot.docs[0];
+                const examData = examDocSnap.data();
+
+                currentActiveExamId = examDocSnap.id; // استخدام معرف المستند الفريد
                 currentExamTitle = examData.title || "اختبار المنهج";
                 examQuestions = examData.questions || [];
                 examDurationMinutes = examData.duration || 5;
