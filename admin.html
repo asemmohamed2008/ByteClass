@@ -118,7 +118,7 @@
         .badge-draft { background: rgba(212, 175, 55, 0.1); color: var(--accent-gold); border: 1px solid rgba(212, 175, 55, 0.3); }
         .badge-published { background: rgba(63, 185, 80, 0.1); color: var(--accent-green); border: 1px solid rgba(63, 185, 80, 0.3); }
 
-        .action-btns { display: flex; gap: 8px; }
+        .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
         .btn-action {
             background: var(--surface-hover); border: 1px solid var(--border-color); color: var(--text-main);
             padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: var(--transition);
@@ -240,18 +240,18 @@
 
         <div class="section-box">
             <div class="section-header">
-                <h2><i class="fa-solid fa-users-gear" style="color: var(--accent-blue);"></i> قاعدة بيانات الطلاب والمراتب</h2>
+                <h2><i class="fa-solid fa-users-gear" style="color: var(--accent-blue);"></i> قاعدة بيانات الطلاب والحالات المالية</h2>
             </div>
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
                             <th>الترتيب</th>
-                            <th>اسم الطالب</th>
+                            <th>اسم الطالب والهاتف</th>
                             <th>الصف</th>
                             <th>النوع</th>
                             <th>النقاط</th>
-                            <th>حالة الامتحان</th>
+                            <th>الحالة المالية (ملاحظة للتنبيه)</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
@@ -503,7 +503,7 @@
             container.appendChild(qDiv);
         };
 
-        // 🚀 حفظ أو تعديل الامتحان (يحفظ كمسودة افتراضياً حتى تضغط نشر)
+        // 🚀 حفظ أو تعديل الامتحان
         document.getElementById('create-exam-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const editingId = document.getElementById('editing-exam-id').value;
@@ -548,7 +548,6 @@
 
             try {
                 if (editingId) {
-                    // تحديث امتحان قائم
                     await updateDoc(doc(db, "exams", editingId), {
                         grade,
                         title,
@@ -559,14 +558,13 @@
                     alert("تم تحديث الامتحان وحفظ التعديلات بنجاح!");
                     cancelEditMode();
                 } else {
-                    // إنشاء امتحان جديد كمسودة (published: false)
                     await addDoc(collection(db, "exams"), {
                         grade: grade,
                         examId: "exam_" + Date.now(),
                         title,
                         duration,
                         questions: questionsList,
-                        published: false, // مسودة افتراضياً
+                        published: false,
                         createdAt: new Date().toISOString()
                     });
                     alert("تم حفظ الامتحان كمسودة بنجاح! لن يظهر للطلاب إلا بعد الضغط على زر (نشر).");
@@ -611,21 +609,28 @@
 
                     let gradeText = st.grade === "1-sec" ? "أولى ثانوي" : "تانية ثانوي";
                     let genderText = st.gender === "female" ? "بنت 👧" : "ولد 👦";
+                    let phone = st.id; // رقم الهاتف هو الـ ID
+                    let financialNote = st.financialNote || ""; // الحالة المالية المخزنة
 
                     tableHtml += `
                         <tr>
                             <td><strong>${rankBadge}</strong></td>
-                            <td>${st.fullName} <br><small style="color:var(--text-dim);">${st.phone}</small></td>
+                            <td>${st.fullName} <br><small style="color:var(--text-dim);">${phone}</small></td>
                             <td>${gradeText}</td>
                             <td>${genderText}</td>
                             <td><strong style="color: var(--accent-green);">${st.points || 0}</strong> نقطة</td>
-                            <td>${st.examCompleted ? '<span class="badge badge-blue">امتحن ✅</span>' : '<span style="color:var(--text-dim);">لم يمتَحِن</span>'}</td>
+                            <td>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" id="note-${phone}" value="${financialNote}" placeholder="مثال: متأخر حصتين" style="background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 6px; width: 100%; font-family: 'Cairo', sans-serif; font-size: 13px;">
+                                    <button class="btn-action" style="background: var(--accent-green); color: #fff; border: none; padding: 6px 12px; font-weight: 750;" onclick="saveStudentFinancial('${phone}')">حفظ</button>
+                                </div>
+                            </td>
                             <td>
                                 <div class="action-btns">
                                     <button class="btn-action" onclick='viewStudentDetails(${JSON.stringify(st)})'>
                                         <i class="fa-solid fa-eye"></i> التفاصيل
                                     </button>
-                                    <button class="btn-action btn-delete" onclick="deleteStudent('${st.phone}', '${st.fullName}')">
+                                    <button class="btn-action btn-delete" onclick="deleteStudent('${phone}', '${st.fullName}')">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
@@ -640,12 +645,12 @@
                             <div style="background:var(--bg-color); border:1px solid var(--border-color); padding:12px 16px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
                                 <div>
                                     <strong>${st.fullName}</strong> (${gradeText}) اختار: <span style="color:var(--accent-gold); font-weight:700;">${st.chosenReward}</span>
-                                    <br><small style="color:var(--text-dim);">هاتف: ${st.phone}</small>
+                                    <br><small style="color:var(--text-dim);">هاتف: ${phone}</small>
                                 </div>
                                 <div>
                                     ${isDelivered ?
                                         '<span class="badge" style="background:rgba(63,185,80,0.15); color:var(--accent-green);">تم التسليم ✅</span>' :
-                                        `<button class="btn-action" style="background:var(--accent-green); color:#fff; border:none;" onclick="markRewardDelivered('${st.phone}')">تأكيد تسليم الهدية</button>`
+                                        `<button class="btn-action" style="background:var(--accent-green); color:#fff; border:none;" onclick="markRewardDelivered('${phone}')">تأكيد تسليم الهدية</button>`
                                     }
                                 </div>
                             </div>
@@ -658,6 +663,20 @@
 
             } catch (error) {
                 console.error("خطأ:", error);
+            }
+        }
+
+        // 🚀 وظيفة حفظ الحالة المالية للطالب يدوياً في فايربيز
+        window.saveStudentFinancial = async function(phone) {
+            const noteValue = document.getElementById(`note-${phone}`).value;
+            try {
+                await updateDoc(doc(db, "students", phone), {
+                    financialNote: noteValue
+                });
+                alert("تم حفظ الحالة المالية وتحديث التنبيه للطالب بنجاح! ✅");
+            } catch (e) {
+                console.error(e);
+                alert("حدث خطأ أثناء حفظ الحالة المالية.");
             }
         }
 
@@ -678,6 +697,7 @@
             document.getElementById('student-modal').style.display = 'flex';
 
             const completedExams = student.completedExams || [];
+            let phone = student.id;
 
             if (completedExams.length === 0) {
                 body.innerHTML = `<p style="color: var(--text-dim); text-align: center; padding: 20px;">لم يقم الطالب بأداء أي اختبارات سابقة حتى الآن.</p>`;
@@ -686,7 +706,7 @@
 
             let html = `
                 <div style="display: flex; gap: 15px; margin-bottom: 20px; background: var(--bg-color); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); flex-wrap: wrap;">
-                    <div><strong>الهاتف:</strong> ${student.phone}</div>
+                    <div><strong>الهاتف:</strong> ${phone}</div>
                     <div><strong>إجمالي النقاط:</strong> <span style="color:var(--accent-green);">${student.points || 0}</span></div>
                     <div><strong>الصف:</strong> ${student.grade === '1-sec' ? 'أولى ثانوي' : 'تانية ثانوي'}</div>
                 </div>
@@ -694,7 +714,6 @@
             `;
 
             try {
-                // جلب الامتحانات المنشورة الخاصة بصف الطالب
                 const qExams = query(collection(db, "exams"), where("grade", "==", student.grade));
                 const examSnapshot = await getDocs(qExams);
                 let examQuestionsMap = {};
