@@ -281,6 +281,7 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const reviewExamId = urlParams.get('reviewId');
+            const targetExamId = urlParams.get('examId');
 
             try {
                 const studentRef = doc(db, "students", phone);
@@ -289,38 +290,52 @@
                 if (!studentSnap.exists()) { window.location.href = "login.html"; return; }
 
                 const studentData = studentSnap.data();
+                const completedList = studentData.completedExams || [];
 
-                // 🚀 جلب أحدث امتحان منشور يخص صف الطالب من السحابة
-                const examsQuery = query(
-                    collection(db, "exams"),
-                    where("grade", "==", studentData.grade),
-                    where("published", "==", true)
-                );
-                const examSnapshot = await getDocs(examsQuery);
-
-                if (examSnapshot.empty) {
-                    document.getElementById('no-exam-box').style.display = 'block';
-                    return;
-                }
-
-                // اختيار أول امتحان منشور متاح لهذا الصف
-                const examDocSnap = examSnapshot.docs[0];
-                const examData = examDocSnap.data();
-
-                currentActiveExamId = examDocSnap.id; // استخدام معرف المستند الفريد
-                currentExamTitle = examData.title || "اختبار المنهج";
-                examQuestions = examData.questions || [];
-                examDurationMinutes = examData.duration || 5;
-
-                // إذا طلب مراجعة اختبار معين قديم من الـ URL
+                // 🚀 إذا طلب مراجعة اختبار سابق
                 if (reviewExamId) {
-                    const completedList = studentData.completedExams || [];
                     const targetExam = completedList.find(ex => ex.examId === reviewExamId);
                     if (targetExam) {
+                        // جلب أسئلة هذا الامتحان القديم لعرضها في المراجعة
+                        const examDocSnap = await getDoc(doc(db, "exams", reviewExamId));
+                        if (examDocSnap.exists()) {
+                            examQuestions = examDocSnap.data().questions || [];
+                        }
                         showReviewScreen(targetExam.answers, targetExam.examTitle, targetExam.score, targetExam.totalScore);
                         return;
                     }
                 }
+
+                let examDocSnap = null;
+
+                // 🚀 جلب الامتحان المطلوب بالـ ID الممرر في الرابط أو أحدث امتحان منشور
+                if (targetExamId) {
+                    const specificExamSnap = await getDoc(doc(db, "exams", targetExamId));
+                    if (specificExamSnap.exists() && specificExamSnap.data().published && specificExamSnap.data().grade === studentData.grade) {
+                        examDocSnap = specificExamSnap;
+                    }
+                }
+
+                if (!examDocSnap) {
+                    const examsQuery = query(
+                        collection(db, "exams"),
+                        where("grade", "==", studentData.grade),
+                        where("published", "==", true)
+                    );
+                    const examSnapshot = await getDocs(examsQuery);
+
+                    if (examSnapshot.empty) {
+                        document.getElementById('no-exam-box').style.display = 'block';
+                        return;
+                    }
+                    examDocSnap = examSnapshot.docs[0];
+                }
+
+                const examData = examDocSnap.data();
+                currentActiveExamId = examDocSnap.id;
+                currentExamTitle = examData.title || "اختبار المنهج";
+                examQuestions = examData.questions || [];
+                examDurationMinutes = examData.duration || 5;
 
                 // تعبئة واجهة المعاينة
                 document.getElementById('preview-exam-title').innerText = currentExamTitle;
@@ -330,8 +345,7 @@
                 document.getElementById('preview-q-count').innerText = `${examQuestions.length} أسئلة`;
                 document.getElementById('preview-total-score').innerText = `${examQuestions.length * 10} درجة`;
 
-                // التحقق هل الطالب حل هذا الامتحان الحالي من قبل؟
-                const completedList = studentData.completedExams || [];
+                // التحقق هل الطالب حل هذا الامتحان من قبل؟
                 const alreadySolved = completedList.some(ex => ex.examId === currentActiveExamId);
 
                 if (alreadySolved) {
@@ -449,7 +463,6 @@
 
                 await updateDoc(studentRef, {
                     points: increment(examScore),
-                    examCompleted: true,
                     completedExams: arrayUnion(examRecord)
                 });
 
