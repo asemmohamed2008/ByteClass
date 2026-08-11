@@ -157,6 +157,15 @@
     </nav>
 
     <div class="main-container">
+
+        <div id="financial-alert-box" style="display: none; background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), var(--surface-color)); border: 1px solid var(--accent-gold); border-radius: 16px; padding: 20px; margin-bottom: 25px; align-items: center; gap: 15px;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 28px; color: var(--accent-gold);"></i>
+            <div>
+                <h4 style="color: var(--accent-gold); font-size: 15px; margin-bottom: 4px;">تنبيه مالي وإداري</h4>
+                <p id="financial-alert-text" style="font-size: 14px; color: var(--text-main);"></p>
+            </div>
+        </div>
+
         <div class="header-section">
             <div class="welcome-card">
                 <h1 id="welcome-text" style="font-size: 24px; font-weight: 900; margin-bottom: 8px;">أهلاً بك يا مبرمج 👋</h1>
@@ -251,6 +260,15 @@
                 document.getElementById('welcome-text').innerText = `أهلاً بك يا ${data.fullName.split(' ')[0]} 👋`;
                 document.getElementById('total-points').innerText = data.points || 0;
                 document.getElementById('student-grade').innerText = data.grade === "1-sec" ? "الصف الأول الثانوي" : "الصف الثاني الثانوي";
+
+                // 🚀 التحقق من وجود ملاحظة مالية للتنبيه
+                const financialNote = data.financialNote;
+                if (financialNote && financialNote.trim() !== "") {
+                    const alertBox = document.getElementById('financial-alert-box');
+                    const alertText = document.getElementById('financial-alert-text');
+                    alertText.innerText = `حالتك المالية الحالية: (${financialNote}). يرجى سرعة تحويل الاشتراك عبر كاش وإبلاغ الباشمهندس .`;
+                    alertBox.style.display = 'flex';
+                }
 
                 // حساب الترتيب
                 const studentsQuery = await getDocs(collection(db, "students"));
